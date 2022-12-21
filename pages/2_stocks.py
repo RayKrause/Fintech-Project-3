@@ -303,7 +303,9 @@ st.sidebar.caption('Presented by Jeff, Thomas and Ray :hotsprings:')
 ##############
 df = yf.download(option,start= start_date,end= end_date, progress=False)
 st.title(option)
+st.caption("note: previous day's closing data")
 st.dataframe(df.tail(1))
+
 st.markdown('##### Buy & Sell Recommendations')
 tickerData = yf.Ticker(option)
 tickerData.recommendations
