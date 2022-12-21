@@ -8,8 +8,6 @@ st.set_page_config(
 
 st.write("# ✨Investor Dashboard")
 st.markdown('### Enhanced investment insights & tools to better serve you.')
-# st.markdown('##### Get investment information straight from our dashboard in a modern way to research the market. Whether its stocks to crypto we have you covered. Our dashboard allows for simple, direct access to investment information with less website jumping, and more flexibility to see what you want to see.')
-
 st.markdown('<div style="text-align: justify;"> Get investment information straight from our dashboard in a modern way to research the market. Whether its stocks to crypto we have you covered. Our dashboard allows for simple, direct access to investment information with less website jumping, and more flexibility to see what you want to see.</div>', unsafe_allow_html=True)
 st.markdown(' ')
 st.markdown(' ')
