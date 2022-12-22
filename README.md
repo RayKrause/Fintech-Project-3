@@ -25,7 +25,7 @@ The stocks landing page includes all of the information as above but also includ
 
 ![.](images/Stock_Landing_Page.png)
 
-![.](images/Institutaional_Holders.png)
+![.](images/Institutional_Holders.png)
 
 ![.](images/Major_Shareholders.png)
 
