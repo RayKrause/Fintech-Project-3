@@ -11,7 +11,7 @@ The application is easy to use and efficent.  Users are promted to select either
 
 The initial datasets outlined for crypto currencies include some of the basic information for the latest day of trading.  The Technical Indicators section ins applicable to both the stocks and crypto landing page and includes a Bollinger Bands, Moving Average Convergence Divergence, Relative Strength Index, True Strength Index and Rate of Change.  Each graph includes a button that will direct the user to helpful information on how to read each graph and their signifigance to the overall securitys financial picture. The final data set that is included in the crypto landing page is a prior 10 day snapshot.
 
-![.](images/Crypto_Dataset.png)
+![.](images/Crypto Dataset.png)
 
 ![.](images/Bollinger_Band.png)
 
