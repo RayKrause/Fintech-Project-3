@@ -376,7 +376,7 @@ with col2:
 progress_bar = st.progress(0)
 # create a 2 column view    
 col1, col2 = st.columns(2)
-
+# plot the True Strength Index (TSI) line chart
 with col1: 
     st.markdown("##### True Strength Index (TSI)")
     st.line_chart(tsi)
@@ -385,7 +385,7 @@ with col1:
     # create a button
     if st.button('True Strength Index (TSI) FAQs'):
         webbrowser.open_new_tab(url)
-
+# plot the Rate of Change (ROC) line chart
 with col2:
     st.markdown("##### Rate of Change (ROC)")
     st.line_chart(roc)
