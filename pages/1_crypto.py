@@ -1,3 +1,8 @@
+#####################
+# crypto page setup #
+#####################
+
+# import libraries
 #pip install yfinance
 import streamlit as st
 import pandas as pd
@@ -6,6 +11,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 import webbrowser
 from PIL import Image
+import datetime
 
 
 ########################
@@ -39,7 +45,7 @@ class IndicatorMixin:
 
 
 def dropna(df: pd.DataFrame) -> pd.DataFrame:
-    """Drop rows with "Nans" values"""
+    # Drop rows with null values
     df = df.copy()
     number_cols = df.select_dtypes("number").columns.to_list()
     df[number_cols] = df[number_cols][df[number_cols] < math.exp(709)]  # big number
@@ -219,10 +225,6 @@ class ROCIndicator(IndicatorMixin):
         ) * 100
 
     def roc(self) -> pd.Series:
-        # """Rate of Change (ROC)
-        # Returns:
-        #     pandas.Series: New feature generated.
-        # """
         roc_series = self._check_fillna(self._roc)
         return pd.Series(roc_series, name="roc")
 
@@ -267,13 +269,14 @@ class TSIIndicator(IndicatorMixin):
         tsi_series = self._check_fillna(self._tsi, value=0)
         return pd.Series(tsi_series, name="tsi")
 
-    
-##################
-# Set up sidebar #
-##################
+###################    
+# Set up sidebar  #
+###################
+
+# set sidebar title 
 st.sidebar.title('Crypto Dashboard 🪙')
 url = 'https://finance.yahoo.com/crypto/?count=25&offset=0'
-
+# add a button to open the yahoo finance website
 if st.sidebar.button('Yahoo! Crypto'):
     webbrowser.open_new_tab(url)
     
@@ -281,10 +284,11 @@ if st.sidebar.button('Yahoo! Crypto'):
 image = Image.open('./images/crypto_coins2.png')
 st.sidebar.image(image)
 
+# load crypto symbols list
 option = st.sidebar.selectbox('Select a Cryptocurrency', ('BTC-USD','ETH-USD','USDT-USD','USDC-USD','BNB-USD','XRP-USD','BUSD-USD','DOGE-USD','ADA-USD','MATIC-USD','DOT-USD','DAI-USD','WTRX-USD','LTC-USD','SOL-USD','TRX-USD','SHIB-USD','HEX-USD','UNI7083-USD','STETH-USD','AVAX-USD','LEO-USD','LINK-USD','WBTC-USD','TON11419-USD','BTT-USD'))
+st.sidebar.caption('Select a symbol or type in the symbol name')
 
-import datetime
-
+# set date and calendar params with error detection
 today = datetime.date.today()
 before = today - datetime.timedelta(days=730)
 start_date = st.sidebar.date_input('Start date', before) 
@@ -294,94 +298,105 @@ if start_date < end_date:
 else:
     st.sidebar.error('Error: End date must fall after start date.')
 
+# add creator information
 st.sidebar.caption('Presented by Jeff, Thomas and Ray :hotsprings:')
 
 ##############
 # Stock data #
 ##############
+
+# setup of the main body window
+# create dataframe to get data from yahoo finance
 df = yf.download(option,start= start_date,end= end_date, progress=False)
 st.title(option)
+# create a 2 column view
 col1, col2 = st.columns(2)
 tickerData = yf.Ticker(option)
 with col1:
     tickerData.major_holders
 with col2:
     tickerData.institutional_holders
+# set a caption title
 st.caption('Provided by Yahoo! finance, results were generated a few mins ago. Pricing data is updated frequently. Currency in USD.')
+# add a progress bar
 progress_bar = st.progress(0)
+# add a subheader
 st.subheader('_Technical Indicators_')
 st.markdown('##### Bollinger Bands®')
+# create the bollinger bands df
 indicator_bb = BollingerBands(df['Close'])
-
 bb = df
 bb['Bollinger_Band_High'] = indicator_bb.bollinger_hband()
 bb['Bollinger_Band_Low'] = indicator_bb.bollinger_lband()
 bb = bb[['Close','Bollinger_Band_High','Bollinger_Band_Low']]
-
+# create the Moving Average Convergence Divergence (MACD) df
 macd = MACD(df['Close']).macd()
-
+# create the Relative Strength Index (RSI) df
 rsi = RSIIndicator(df['Close']).rsi()
-
+# create the True Strength Index (TSI) df
 tsi = TSIIndicator(df['Close']).tsi()
-
+# create the Rate of Change (ROC) df
 roc = ROCIndicator(df['Close']).roc()
 
 ###################
 # Set up main app #
 ###################
 
+# plot the bollinger bands line chart
 st.line_chart(bb)
-
+# set the chickable button url detail
 url = 'https://www.investopedia.com/articles/technical/102201.asp'
-
+# create a button
 if st.button('Bollinger Bands® FAQs'):
     webbrowser.open_new_tab(url)
-
+# add a seperator line
 progress_bar = st.progress(0)
+# create a 2 column view
 col1, col2 = st.columns(2)
-
+# plot the Moving Average Convergence Divergence (MACD) line chart
 with col1: 
     st.markdown('##### Moving Average Convergence Divergence (MACD)')
     st.area_chart(macd)
-
+    # set the chickable button url detail
     url = 'https://www.investopedia.com/terms/m/macd.asp'
-
+    # create a button
     if st.button('MACD FAQs'):
         webbrowser.open_new_tab(url)
-    
+# plot the Relative Strength Index (RSI) line chart    
 with col2:
     st.markdown("##### Relative Strength Index (RSI)")
     st.line_chart(rsi)
     st.markdown(" ")
+    # set the chickable button url detail
     url = 'https://www.investopedia.com/terms/r/rsi.asp'
-
+    # create a button
     if st.button('Relative Strength Index (RSI) FAQs'):
         webbrowser.open_new_tab(url)
-
+# add a seperator line
 progress_bar = st.progress(0)
-    
+# create a 2 column view    
 col1, col2 = st.columns(2)
 
 with col1: 
     st.markdown("##### True Strength Index (TSI)")
     st.line_chart(tsi)
-    
+     # set the chickable button url detail 
     url = 'https://www.investopedia.com/terms/t/tsi.asp'
-
+    # create a button
     if st.button('True Strength Index (TSI) FAQs'):
         webbrowser.open_new_tab(url)
 
 with col2:
     st.markdown("##### Rate of Change (ROC)")
     st.line_chart(roc)
-    
+    # set the chickable button url detail
     url = 'https://www.investopedia.com/terms/r/rateofchange.asp'
-
+    # create a button
     if st.button('Rate of Change (ROC) FAQs'):
         webbrowser.open_new_tab(url)
-
+# add a seperator line
 progress_bar = st.progress(0)
-        
+# display a snapshot of the df data        
 st.markdown("##### 10 Day Snapshot :chart_with_upwards_trend:")
 st.write(option)
 st.dataframe(df.tail(10))
@@ -391,9 +406,11 @@ progress_bar = st.progress(0)
 # Download csv #
 ################
 
+# load imports
 import base64
 from io import BytesIO
 
+# define the excel function
 def to_excel(df):
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -406,17 +423,17 @@ def get_table_download_link(df):
     val = to_excel(df)
     b64 = base64.b64encode(val)
     return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="download.xlsx">Download excel file</a>'
-
+# define section title and download link
 st.markdown(" ")
 st.markdown("##### Create Crypto Report :pencil:")
 st.markdown(get_table_download_link(df), unsafe_allow_html=True)
-
+# define the csv dataframe function
 @st.cache
 def convert_df(df):
     return df.to_csv().encode('utf-8')
 
 csv = convert_df(df)
-
+# create the csv file button and download details
 st.download_button(
     label="Download data as CSV",
     data=csv,
