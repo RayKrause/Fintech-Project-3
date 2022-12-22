@@ -272,7 +272,6 @@ class TSIIndicator(IndicatorMixin):
 ###################    
 # Set up sidebar  #
 ###################
-
 # set sidebar title 
 st.sidebar.title('Crypto Dashboard 🪙')
 url = 'https://finance.yahoo.com/crypto/?count=25&offset=0'
