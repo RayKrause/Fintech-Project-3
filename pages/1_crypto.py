@@ -18,10 +18,11 @@ import datetime
 # Technical Indicators #
 ########################
 
+# Create a Mixin of interdependent non-side-effect-free code that is shared between components.
 class IndicatorMixin:
 
     _fillna = False
-
+    # check nulls
     def _check_fillna(self, series: pd.Series, value: int = 0) -> pd.Series:
 
         if self._fillna:
@@ -34,6 +35,7 @@ class IndicatorMixin:
         return series
 
     @staticmethod
+    # define the True Range which is the greatest distance you can find between any two of these three prices.
     def _true_range(
         high: pd.Series, low: pd.Series, prev_close: pd.Series
     ) -> pd.Series:
@@ -43,7 +45,7 @@ class IndicatorMixin:
         true_range = pd.DataFrame(data={"tr1": tr1, "tr2": tr2, "tr3": tr3}).max(axis=1)
         return true_range
 
-
+# define dropna function
 def dropna(df: pd.DataFrame) -> pd.DataFrame:
     # Drop rows with null values
     df = df.copy()
@@ -53,19 +55,19 @@ def dropna(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna()
     return df
 
-
+# define simple moving average (SMA)
 def _sma(series, periods: int, fillna: bool = False):
     min_periods = 0 if fillna else periods
     return series.rolling(window=periods, min_periods=min_periods).mean()
 
-
+# define exponential moving average (EMA) that places a greater weight and significance on the most recent data points.
 def _ema(series, periods, fillna=False):
     min_periods = 0 if fillna else periods
     return series.ewm(span=periods, min_periods=min_periods, adjust=False).mean()
 
-
+# Calling min() and max() With a Single Iterable Argument
 def _get_min_max(series1: pd.Series, series2: pd.Series, function: str = "min"):
-    """Find min or max value between two lists for each index"""
+    # Find min or max value between two lists for each index
     series1 = np.array(series1)
     series2 = np.array(series2)
     if function == "min":
@@ -77,9 +79,9 @@ def _get_min_max(series1: pd.Series, series2: pd.Series, function: str = "min"):
 
     return pd.Series(output)
 
-
+# Setup BollingerBands
 class BollingerBands(IndicatorMixin):
-
+    # The __init__ function is called every time an object is created from a class
     def __init__(
         self,
         close: pd.Series,
@@ -92,7 +94,7 @@ class BollingerBands(IndicatorMixin):
         self._window_dev = window_dev
         self._fillna = fillna
         self._run()
-
+    # define the BollingerBands run function
     def _run(self):
         min_periods = 0 if self._fillna else self._window
         self._mavg = self._close.rolling(self._window, min_periods=min_periods).mean()
@@ -101,36 +103,36 @@ class BollingerBands(IndicatorMixin):
         )
         self._hband = self._mavg + self._window_dev * self._mstd
         self._lband = self._mavg - self._window_dev * self._mstd
-
+    # define bollinger moving average Bollinger, channel middle band and returns pandas.Series new feature generated
     def bollinger_mavg(self) -> pd.Series:
         mavg = self._check_fillna(self._mavg, value=-1)
         return pd.Series(mavg, name="mavg")
-
+    # Add bollinger band high indicator filling nans values, channel middle band and returns pandas.Series new feature generated
     def bollinger_hband(self) -> pd.Series:
         hband = self._check_fillna(self._hband, value=-1)
         return pd.Series(hband, name="hband")
-
+    # Add bollinger band low indicator filling nans values, channel lower band and returns pandas.Series new feature generated
     def bollinger_lband(self) -> pd.Series:
         lband = self._check_fillna(self._lband, value=-1)
         return pd.Series(lband, name="lband")
-
+    # Add bollinger band width indicator filling nans values, channel width band and returns pandas.Series new feature generated
     def bollinger_wband(self) -> pd.Series:
         wband = ((self._hband - self._lband) / self._mavg) * 100
         wband = self._check_fillna(wband, value=0)
         return pd.Series(wband, name="bbiwband")
-
+    # Add bollinger band percentage indicator filling nans values, channel percentage band and returns pandas.Series new feature generated
     def bollinger_pband(self) -> pd.Series:
         pband = (self._close - self._lband) / (self._hband - self._lband)
         pband = self._check_fillna(pband, value=0)
         return pd.Series(pband, name="bbipband")
-
+    # Bollinger Channel Indicator Crossing High Band (binary). It returns 1, if close is higher than bollinger_hband. Else, it returns 0 and returns pandas.Series new feature generated
     def bollinger_hband_indicator(self) -> pd.Series:
         hband = pd.Series(
             np.where(self._close > self._hband, 1.0, 0.0), index=self._close.index
         )
         hband = self._check_fillna(hband, value=0)
         return pd.Series(hband, index=self._close.index, name="bbihband")
-
+    # Bollinger Channel Indicator Crossing Low Band (binary). It returns 1, if close is lower than bollinger_lband. Else, it returns 0 and returns pandas.Series new feature generated
     def bollinger_lband_indicator(self) -> pd.Series:
         lband = pd.Series(
             np.where(self._close < self._lband, 1.0, 0.0), index=self._close.index
@@ -138,14 +140,15 @@ class BollingerBands(IndicatorMixin):
         lband = self._check_fillna(lband, value=0)
         return pd.Series(lband, name="bbilband")
 
+# Relative Strength Index (RSI) Compares the magnitude of recent gains and losses over a specified time period to measure speed and change of price movements of a security. It is primarily used to attempt to identify overbought or oversold conditions in the trading of an asset.
 class RSIIndicator(IndicatorMixin):
-
+    # The __init__ function is called every time an object is created from a class
     def __init__(self, close: pd.Series, window: int = 14, fillna: bool = False):
         self._close = close
         self._window = window
         self._fillna = fillna
         self._run()
-
+    # define the Relative Strength Index run function
     def _run(self):
         diff = self._close.diff(1)
         up_direction = diff.where(diff > 0, 0.0)
@@ -162,13 +165,14 @@ class RSIIndicator(IndicatorMixin):
             np.where(emadn == 0, 100, 100 - (100 / (1 + relative_strength))),
             index=self._close.index,
         )
-
+    # define Relative Strength Index (RSI) check nulls and returns pandas.Series new feature generated
     def rsi(self) -> pd.Series:
         rsi_series = self._check_fillna(self._rsi, value=50)
         return pd.Series(rsi_series, name="rsi")
-    
-class MACD(IndicatorMixin):
 
+# Moving Average Convergence Divergence (MACD) Is a trend-following momentum indicator that shows the relationship between two moving averages of prices.
+class MACD(IndicatorMixin):
+    # The __init__ function is called every time an object is created from a class
     def __init__(
         self,
         close: pd.Series,
@@ -183,53 +187,55 @@ class MACD(IndicatorMixin):
         self._window_sign = window_sign
         self._fillna = fillna
         self._run()
-
+    # define the Moving Average Convergence Divergence (MACD) run function
     def _run(self):
         self._emafast = _ema(self._close, self._window_fast, self._fillna)
         self._emaslow = _ema(self._close, self._window_slow, self._fillna)
         self._macd = self._emafast - self._emaslow
         self._macd_signal = _ema(self._macd, self._window_sign, self._fillna)
         self._macd_diff = self._macd - self._macd_signal
-
+    # define MACD line, check nulls and returns pandas.Series new feature generated
     def macd(self) -> pd.Series:
         macd_series = self._check_fillna(self._macd, value=0)
         return pd.Series(
             macd_series, name=f"MACD_{self._window_fast}_{self._window_slow}"
         )
-
+    # define MACD signal, check nulls and returns pandas.Series new feature generated
     def macd_signal(self) -> pd.Series:
         macd_signal_series = self._check_fillna(self._macd_signal, value=0)
         return pd.Series(
             macd_signal_series,
             name=f"MACD_sign_{self._window_fast}_{self._window_slow}",
         )
-
+    # define MACD histogram, check nulls and returns pandas.Series new feature generated
     def macd_diff(self) -> pd.Series:
         macd_diff_series = self._check_fillna(self._macd_diff, value=0)
         return pd.Series(
             macd_diff_series, name=f"MACD_diff_{self._window_fast}_{self._window_slow}"
         )
 
+# The Rate-of-Change (ROC) indicator, which is also referred to as simply Momentum, is a pure momentum oscillator. The ROC calculation compares the current price with the price "n" periods ago
 class ROCIndicator(IndicatorMixin):
-
+    # The __init__ function is called every time an object is created from a class
     def __init__(self, close: pd.Series, window: int = 12, fillna: bool = False):
         self._close = close
         self._window = window
         self._fillna = fillna
         self._run()
-
+    # define the rate of change run function
     def _run(self):
         self._roc = (
             (self._close - self._close.shift(self._window))
             / self._close.shift(self._window)
         ) * 100
-
+    # define rate of change, check nulls and returns pandas.Series new feature generated
     def roc(self) -> pd.Series:
         roc_series = self._check_fillna(self._roc)
         return pd.Series(roc_series, name="roc")
 
+# The true strength index (TSI) is a technical momentum oscillator used to identify trends and reversals. The indicator may be useful for determining overbought and oversold conditions, indicating potential trend direction changes via centerline or signal line crossovers, and warning of trend weakness through divergence.
 class TSIIndicator(IndicatorMixin):
-
+    # The __init__ function is called every time an object is created from a class
     def __init__(
         self,
         close: pd.Series,
@@ -242,7 +248,7 @@ class TSIIndicator(IndicatorMixin):
         self._window_fast = window_fast
         self._fillna = fillna
         self._run()
-
+    # define the true strength index run function
     def _run(self):
         diff_close = self._close - self._close.shift(1)
         min_periods_r = 0 if self._fillna else self._window_slow
@@ -264,7 +270,7 @@ class TSIIndicator(IndicatorMixin):
         )
         self._tsi = smoothed / smoothed_abs
         self._tsi *= 100
-
+    # define the true strength index, check nulls and returns pandas.Series new feature generated
     def tsi(self) -> pd.Series:
         tsi_series = self._check_fillna(self._tsi, value=0)
         return pd.Series(tsi_series, name="tsi")
