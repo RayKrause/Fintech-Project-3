@@ -14,10 +14,22 @@ The initial datasets outlined for crypto currencies include some of the basic in
 ![.](images/Crypto_Dataset.png)
 
 ![.](images/Bollinger_Band.png)
+Key Bollinger Bands® Takeaway's
+Bollinger Bands® consist of a centerline and two price channels or bands above and below it. The centerline is typically a simple moving average while the price channels are standard deviations of the stock being studied. The bands expand and contract as price action becomes volatile (expansion) or bound into a tight trading pattern (contraction). Traders designate the upper and lower bands as price targets when drawing the bands. When the price continually touches the upper Bollinger Band, it can indicate an overbought signal while continually touching the lower band indicates an oversold signal.
 
 ![.](images/MACD_RSI.png)
+Key MACD Takeaway's
+The moving average convergence/divergence (MACD, or MAC-D) line is calculated by subtracting the 26-period exponential moving average (EMA) from the 12-period EMA. The signal line is a nine-period EMA of the MACD line. MACD is best used with daily periods, where the traditional settings of 26/12/9 days is the norm. MACD triggers technical signals when the MACD line crosses above the signal line (to buy) or falls below it (to sell). MACD can help gauge whether a security is overbought or oversold, alerting traders to the strength of a directional move, and warning of a potential price reversal. MACD can also alert investors to bullish/bearish divergences (e.g., when a new high in price is not confirmed by a new high in MACD, and vice versa), suggesting a potential failure and reversal. After a signal line crossover, it is recommended to wait for three or four days to confirm that it is not a false move.
+
+Key RSI Takeaway's
+The relative strength index (RSI) is a popular momentum oscillator introduced in 1978. The RSI provides technical traders with signals about bullish and bearish price momentum, and it is often plotted beneath the graph of an asset’s price. An asset is usually considered overbought when the RSI is above 70 and oversold when it is below 30. The RSI line crossing below the overbought line or above oversold line is often seen by traders as a signal to buy or sell. The RSI works best in trading ranges rather than trending markets.
 
 ![.](images/TSI_ROC.png)
+Key TSI Takeaway's
+The TSI fluctuates between positive and negative territory. Positive territory means the bulls are more in control of the asset. Negative territory means the bears are more in control. When the indicator divergences with price, the TSI may be signaling the price trend is weakening and may reverse. A signal line can be applied to the TSI indicator. When the TSI crosses above the signal line it can be used as a buy signal, and when it crosses below, a sell signal. Such crossovers occur frequently, so use with caution. Overbought and oversold levels will vary by the asset being traded.
+
+Key ROC Takeaway's
+Rate of change (ROC) refers to how quickly something changes over time. It is thus the acceleration or deceleration of changes (i.e., the rate) and not the magnitude of individual changes themselves. In finance, rate of change is used to understand price returns and identify momentum in trends. Moving averages are used by traders to understand the rates of change in asset prices by smoothing them out. The Price Rate of Change indicator is a technical tool that measures the percentage change in price between the current price and the price a certain number of periods ago.
 
 # Stocks
 
