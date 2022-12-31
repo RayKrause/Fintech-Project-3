@@ -67,3 +67,14 @@ st.markdown('<div style="text-align: justify;"> For either landing page the user
 st.markdown(' ')
 image = Image.open('./images/Create_File.png')
 st.image(image)
+###################    
+# Set up sidebar  #
+###################
+# set sidebar title 
+st.sidebar.title('Readme File 📖')
+
+# from PIL import Image 
+image = Image.open('./images/readme.png')
+st.sidebar.image(image)
+
+st.sidebar.caption('Presented by Jeff, Thomas and Ray :hotsprings:')
