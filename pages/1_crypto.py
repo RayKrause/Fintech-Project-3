@@ -18,11 +18,10 @@ import datetime
 # Technical Indicators #
 ########################
 
-# Create a Mixin of interdependent non-side-effect-free code that is shared between components.
 class IndicatorMixin:
 
     _fillna = False
-    # check nulls
+
     def _check_fillna(self, series: pd.Series, value: int = 0) -> pd.Series:
 
         if self._fillna:
@@ -35,7 +34,6 @@ class IndicatorMixin:
         return series
 
     @staticmethod
-    # define the True Range which is the greatest distance you can find between any two of these three prices.
     def _true_range(
         high: pd.Series, low: pd.Series, prev_close: pd.Series
     ) -> pd.Series:
@@ -45,7 +43,7 @@ class IndicatorMixin:
         true_range = pd.DataFrame(data={"tr1": tr1, "tr2": tr2, "tr3": tr3}).max(axis=1)
         return true_range
 
-# define dropna function
+
 def dropna(df: pd.DataFrame) -> pd.DataFrame:
     # Drop rows with null values
     df = df.copy()
@@ -55,19 +53,19 @@ def dropna(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna()
     return df
 
-# define simple moving average (SMA)
+
 def _sma(series, periods: int, fillna: bool = False):
     min_periods = 0 if fillna else periods
     return series.rolling(window=periods, min_periods=min_periods).mean()
 
-# define exponential moving average (EMA) that places a greater weight and significance on the most recent data points.
+
 def _ema(series, periods, fillna=False):
     min_periods = 0 if fillna else periods
     return series.ewm(span=periods, min_periods=min_periods, adjust=False).mean()
 
-# Calling min() and max() With a Single Iterable Argument
+
 def _get_min_max(series1: pd.Series, series2: pd.Series, function: str = "min"):
-    # Find min or max value between two lists for each index
+    """Find min or max value between two lists for each index"""
     series1 = np.array(series1)
     series2 = np.array(series2)
     if function == "min":
@@ -79,9 +77,9 @@ def _get_min_max(series1: pd.Series, series2: pd.Series, function: str = "min"):
 
     return pd.Series(output)
 
-# Setup BollingerBands
+
 class BollingerBands(IndicatorMixin):
-    # The __init__ function is called every time an object is created from a class
+
     def __init__(
         self,
         close: pd.Series,
@@ -94,7 +92,7 @@ class BollingerBands(IndicatorMixin):
         self._window_dev = window_dev
         self._fillna = fillna
         self._run()
-    # define the BollingerBands run function
+
     def _run(self):
         min_periods = 0 if self._fillna else self._window
         self._mavg = self._close.rolling(self._window, min_periods=min_periods).mean()
@@ -103,36 +101,36 @@ class BollingerBands(IndicatorMixin):
         )
         self._hband = self._mavg + self._window_dev * self._mstd
         self._lband = self._mavg - self._window_dev * self._mstd
-    # define bollinger moving average Bollinger, channel middle band and returns pandas.Series new feature generated
+
     def bollinger_mavg(self) -> pd.Series:
         mavg = self._check_fillna(self._mavg, value=-1)
         return pd.Series(mavg, name="mavg")
-    # Add bollinger band high indicator filling nans values, channel middle band and returns pandas.Series new feature generated
+
     def bollinger_hband(self) -> pd.Series:
         hband = self._check_fillna(self._hband, value=-1)
         return pd.Series(hband, name="hband")
-    # Add bollinger band low indicator filling nans values, channel lower band and returns pandas.Series new feature generated
+
     def bollinger_lband(self) -> pd.Series:
         lband = self._check_fillna(self._lband, value=-1)
         return pd.Series(lband, name="lband")
-    # Add bollinger band width indicator filling nans values, channel width band and returns pandas.Series new feature generated
+
     def bollinger_wband(self) -> pd.Series:
         wband = ((self._hband - self._lband) / self._mavg) * 100
         wband = self._check_fillna(wband, value=0)
         return pd.Series(wband, name="bbiwband")
-    # Add bollinger band percentage indicator filling nans values, channel percentage band and returns pandas.Series new feature generated
+
     def bollinger_pband(self) -> pd.Series:
         pband = (self._close - self._lband) / (self._hband - self._lband)
         pband = self._check_fillna(pband, value=0)
         return pd.Series(pband, name="bbipband")
-    # Bollinger Channel Indicator Crossing High Band (binary). It returns 1, if close is higher than bollinger_hband. Else, it returns 0 and returns pandas.Series new feature generated
+
     def bollinger_hband_indicator(self) -> pd.Series:
         hband = pd.Series(
             np.where(self._close > self._hband, 1.0, 0.0), index=self._close.index
         )
         hband = self._check_fillna(hband, value=0)
         return pd.Series(hband, index=self._close.index, name="bbihband")
-    # Bollinger Channel Indicator Crossing Low Band (binary). It returns 1, if close is lower than bollinger_lband. Else, it returns 0 and returns pandas.Series new feature generated
+
     def bollinger_lband_indicator(self) -> pd.Series:
         lband = pd.Series(
             np.where(self._close < self._lband, 1.0, 0.0), index=self._close.index
@@ -140,15 +138,14 @@ class BollingerBands(IndicatorMixin):
         lband = self._check_fillna(lband, value=0)
         return pd.Series(lband, name="bbilband")
 
-# Relative Strength Index (RSI) Compares the magnitude of recent gains and losses over a specified time period to measure speed and change of price movements of a security. It is primarily used to attempt to identify overbought or oversold conditions in the trading of an asset.
 class RSIIndicator(IndicatorMixin):
-    # The __init__ function is called every time an object is created from a class
+
     def __init__(self, close: pd.Series, window: int = 14, fillna: bool = False):
         self._close = close
         self._window = window
         self._fillna = fillna
         self._run()
-    # define the Relative Strength Index run function
+
     def _run(self):
         diff = self._close.diff(1)
         up_direction = diff.where(diff > 0, 0.0)
@@ -165,14 +162,13 @@ class RSIIndicator(IndicatorMixin):
             np.where(emadn == 0, 100, 100 - (100 / (1 + relative_strength))),
             index=self._close.index,
         )
-    # define Relative Strength Index (RSI) check nulls and returns pandas.Series new feature generated
+
     def rsi(self) -> pd.Series:
         rsi_series = self._check_fillna(self._rsi, value=50)
         return pd.Series(rsi_series, name="rsi")
-
-# Moving Average Convergence Divergence (MACD) Is a trend-following momentum indicator that shows the relationship between two moving averages of prices.
+    
 class MACD(IndicatorMixin):
-    # The __init__ function is called every time an object is created from a class
+
     def __init__(
         self,
         close: pd.Series,
@@ -187,55 +183,53 @@ class MACD(IndicatorMixin):
         self._window_sign = window_sign
         self._fillna = fillna
         self._run()
-    # define the Moving Average Convergence Divergence (MACD) run function
+
     def _run(self):
         self._emafast = _ema(self._close, self._window_fast, self._fillna)
         self._emaslow = _ema(self._close, self._window_slow, self._fillna)
         self._macd = self._emafast - self._emaslow
         self._macd_signal = _ema(self._macd, self._window_sign, self._fillna)
         self._macd_diff = self._macd - self._macd_signal
-    # define MACD line, check nulls and returns pandas.Series new feature generated
+
     def macd(self) -> pd.Series:
         macd_series = self._check_fillna(self._macd, value=0)
         return pd.Series(
             macd_series, name=f"MACD_{self._window_fast}_{self._window_slow}"
         )
-    # define MACD signal, check nulls and returns pandas.Series new feature generated
+
     def macd_signal(self) -> pd.Series:
         macd_signal_series = self._check_fillna(self._macd_signal, value=0)
         return pd.Series(
             macd_signal_series,
             name=f"MACD_sign_{self._window_fast}_{self._window_slow}",
         )
-    # define MACD histogram, check nulls and returns pandas.Series new feature generated
+
     def macd_diff(self) -> pd.Series:
         macd_diff_series = self._check_fillna(self._macd_diff, value=0)
         return pd.Series(
             macd_diff_series, name=f"MACD_diff_{self._window_fast}_{self._window_slow}"
         )
 
-# The Rate-of-Change (ROC) indicator, which is also referred to as simply Momentum, is a pure momentum oscillator. The ROC calculation compares the current price with the price "n" periods ago
 class ROCIndicator(IndicatorMixin):
-    # The __init__ function is called every time an object is created from a class
+
     def __init__(self, close: pd.Series, window: int = 12, fillna: bool = False):
         self._close = close
         self._window = window
         self._fillna = fillna
         self._run()
-    # define the rate of change run function
+
     def _run(self):
         self._roc = (
             (self._close - self._close.shift(self._window))
             / self._close.shift(self._window)
         ) * 100
-    # define rate of change, check nulls and returns pandas.Series new feature generated
+
     def roc(self) -> pd.Series:
         roc_series = self._check_fillna(self._roc)
         return pd.Series(roc_series, name="roc")
 
-# The true strength index (TSI) is a technical momentum oscillator used to identify trends and reversals. The indicator may be useful for determining overbought and oversold conditions, indicating potential trend direction changes via centerline or signal line crossovers, and warning of trend weakness through divergence.
 class TSIIndicator(IndicatorMixin):
-    # The __init__ function is called every time an object is created from a class
+
     def __init__(
         self,
         close: pd.Series,
@@ -248,7 +242,7 @@ class TSIIndicator(IndicatorMixin):
         self._window_fast = window_fast
         self._fillna = fillna
         self._run()
-    # define the true strength index run function
+
     def _run(self):
         diff_close = self._close - self._close.shift(1)
         min_periods_r = 0 if self._fillna else self._window_slow
@@ -270,7 +264,7 @@ class TSIIndicator(IndicatorMixin):
         )
         self._tsi = smoothed / smoothed_abs
         self._tsi *= 100
-    # define the true strength index, check nulls and returns pandas.Series new feature generated
+
     def tsi(self) -> pd.Series:
         tsi_series = self._check_fillna(self._tsi, value=0)
         return pd.Series(tsi_series, name="tsi")
@@ -278,6 +272,7 @@ class TSIIndicator(IndicatorMixin):
 ###################    
 # Set up sidebar  #
 ###################
+
 # set sidebar title 
 st.sidebar.title('Crypto Dashboard 🪙')
 url = 'https://finance.yahoo.com/crypto/?count=25&offset=0'
@@ -290,10 +285,374 @@ image = Image.open('./images/crypto_coins2.png')
 st.sidebar.image(image)
 
 # load crypto symbols list
-option = st.sidebar.selectbox('Select a Cryptocurrency', ('ALGO-USD','BTC-USD','ETH-USD','USDT-USD','USDC-USD','BNB-USD','XRP-USD','BUSD-USD','DOGE-USD','ADA-USD','MATIC-USD','DOT-USD','DAI-USD','WTRX-USD','LTC-USD','SOL-USD','TRX-USD','SHIB-USD','HEX-USD','UNI7083-USD','STETH-USD','AVAX-USD','LEO-USD','LINK-USD','WBTC-USD','TON11419-USD','BTT-USD','RLY-USD','METIS-USD','FIDA-USD','MLN-USD','KRL-EUR','AURORA-USD','POWR-EUR','FORT-USDT','SPELL-USD','BIT-USDT','MXC-USD','UMA-GBP','NKN-EUR','DEXT-USD','TRIBE-USD','OOKI-USD','VGX-EUR','BNT-EUR','NU-USD','WLUNA-USD','QI-USD','XLM-USD','MIR-USD','COMP-BTC','APE-EUR','LCX-USD','MKR-USD',
-'SHIB-USDT','NMR-BTC','REQ-BTC','SUSHI-ETH','MINA-USD','CGLD-USD','JUP-USD','AVT-USD','BAND-BTC','WCFG-USD','WAMPL-USD','ICP-USD','APT-USD','DOGE-USDT','BNT-GBP','GALA-USD','MKR-BTC','FORTH-BTC','SUPER-USDT','KRL-USDT','RPL-USD','RBN-USD','FIL-EUR','DYP-USDT','ZEC-USD','CTX-USD','HBAR-USDT','DIA-USD','ELA-USD','TIME-USD','SNX-EUR','KNC-USD','AIOZ-USD','SUPER-USD','AAVE-BTC','DYP-USD','AUCTION-USD','ICP-USDT','CLV-USD','ADA-GBP','GMT-USDT','STG-USDT','BUSD-USD','BAT-USDC','SHPING-USDT','POLS-USDT','DDX-EUR','AVAX-BTC','HOPR-USDT','BAT-ETH','HFT-USD','PERP-EUR','USDT-USD','FARM-USD','REP-USD','AGLD-USD','CRPT-USD','ATOM-EUR','LOOM-USDC','DAI-USDC','DOGE-USD','LINK-BTC','CLV-EUR','BTRST-GBP','HIGH-USD','ALGO-GBP','FIS-USD','ILV-USD','BCH-USD','DREP-USD','FOX-USD','BCH-BTC','RLC-BTC','MASK-EUR','SHPING-EUR','ALGO-BTC','DDX-USDT','TRU-USD','LRC-BTC','AMP-USD','RNDR-USDT','ATA-USDT','LINK-USDT','MUSE-USD','FLOW-USDT','KSM-USDT','COTI-USD','POWR-USDT','CTX-USDT','ADA-USD','UST-EUR','DOT-GBP','BTCAUCTION-USD','ADA-USDT','PUNDIX-USD','CVC-USDC','ETH-USDT','BAND-GBP','WCFG-EUR','MINA-EUR','LDO-USD','POLY-USDT','RARI-USD','ENS-USD','CVC-USD','STX-USD','DOGE-GBP','BAT-USD','MEDIA-USDT','BTRST-BTC','SUSHI-USD','BCH-EUR','1INCH-EUR','XYO-USDT','SHIB-USD','PYR-USD','LCX-USDT','SOL-BTC','CRV-USD','YFI-USD','SHPING-USD','BADGER-USD','NEST-USDT','GRT-USD','ADA-USDC','MASK-GBP','OMG-GBP','COMP-USD','CGLD-GBP','XRP-GBP','00-USD','ALGO-USD','SKL-USD','API3-USDT','FORTH-USD','SPELL-USDT','USDT-EUR','INDEX-USD','AST-USD','CRV-EUR','CVX-USD','STORJ-USD','GRT-BTC','MCO2-USDT','SHIB-EUR','ETH-EUR','APT-USDT','VGX-USD','DOT-EUR','IDEX-USDT','BTC-GBP','FIL-GBP','LIT-USD','BIT-USD','USDC-EUR','KNC-BTC','MASK-USDT','GFI-USD','DAI-USD','INJ-USD','DASH-BTC','ENJ-USD','YFII-USD','XCN-USD','RLY-USDT','BNT-BTC','GNO-USDT','AAVE-GBP','OP-USD','LTC-GBP','DOGE-EUR','ASM-USD','MPL-USD','CTSI-USD','OGN-BTC','AGLD-USDT','AXS-BTC','HBAR-USD','LTC-BTC','NEAR-USDT','FX-USD','SOL-USDT','OGN-USD','NEAR-USD','NEST-USD','OMG-BTC','GRT-GBP',
-'COVAL-USD','CRO-USD','UNI-EUR','AERGO-USD','PERP-USDT','PLA-USD','ANKR-BTC','MANA-EUR','LRC-USD','C98-USD','CRV-GBP','ICP-BTC','RGT-USD','LPT-USD','RAD-BTC','UMA-EUR','NU-EUR','CGLD-EUR','MANA-ETH','ETC-USD','XLM-USDT','ICP-EUR','SOL-GBP','AAVE-EUR','RLY-GBP','AXS-USDT','DASH-USD','DESO-USD','BNT-USD','MUSD-USD','AVAX-USDT','LTC-EUR','XTZ-EUR','ROSE-USD','UMA-USD','GNO-USD','ACH-USD','SAND-USDT','JASMY-USD','MSOL-USD','SNX-BTC','FET-USDT','MIR-GBP','DESO-USDT','1INCH-GBP','KSM-USD','RAD-GBP','OMG-USD','ALGO-EUR','MATH-USD','ATOM-USD','TRAC-USDT','RARE-USD','ETH-GBP','LOKA-USD','FIDA-EUR','ARPA-USD','ORCA-USD','FORT-USD','AXS-EUR','BAND-USD','LQTY-USDT','KRL-USD','MINA-USDT','DOT-BTC','XRP-EUR','DOGE-BTC','NU-GBP','XTZ-USD','CHZ-USD','NCT-USD','TRB-USD','REP-BTC','BAND-EUR','ZEN-BTC','XRP-BTC','FIDA-USDT','AVAX-USD','GAL-USD','CELR-USD','ABT-USD','HOPR-USD','FORTH-GBP','WBTC-USD','UPI-USD','MIR-BTC','SYLO-USD','BOBA-USD','LINK-GBP','NKN-GBP','ZEC-USDC','IDEX-USD','TRAC-EUR','AUCTION-EUR','ETH-USDC','POND-USDT','MANA-USD','PRQ-USDT','POWR-USD','COVAL-USDT','CGLD-BTC','USDT-USDC','AVAX-EUR','TONE-USD','AUCTION-USDT','ANKR-EUR','AIOZ-USDT','QUICK-USD','BTRST-USDT','ATOM-USDT','API3-USD','SUKU-EUR','NKN-USD','FARM-USDT','CRO-EUR','RAI-USD','PAX-USDT','SNX-USD','APE-USDT','MATIC-USD','XTZ-GBP','CHZ-EUR','GAL-USDT','SUKU-USDT','XYO-BTC','ORN-USD','POND-USD','RLC-USD','FIS-USDT','CTSI-BTC','ORN-BTC','IOTX-USD','ZRX-EUR','UMA-BTC','UNI-BTC','XRP-USD','OXT-USD','GTC-USD','PRQ-USD','YFI-BTC','HFT-USDT','SNX-GBP','BOND-USD','INV-USD','LRC-USDT','NMR-EUR','BTC-EUR','DAR-USD','BTRST-USD','ALCX-USDT','BAT-EUR','ROSE-USDT','RNDR-EUR','MANA-BTC','C98-USDT','GALA-EUR','SNT-USD','METIS-USDT','XYO-EUR','QSP-USD','MTL-USD','1INCH-USD','REQ-USDT','ENJ-USDT','TRU-USDT','ETH-USD','INDEX-USDT','ALICE-USD','ACH-USDT','LINK-EUR','QNT-USDT','CRV-BTC','OCEAN-USD','ZEC-BTC','MCO2-USD','REN-BTC','GALA-USDT','REQ-GBP','WAMPL-USDT','FOX-USDT','GLM-USD','LINK-ETH','DDX-USD','JASMY-USDT','SUSHI-EUR','USDC-GBP','PRO-USD','BTC-USDC','RNDR-USD','MATIC-BTC','1INCH-BTC','GMT-USD','NKN-BTC','ZEN-USD','STG-USD','ENS-EUR','CHZ-USDT','WCFG-BTC','GST-USD','NCT-USDT','UPI-USDT','AXS-USD','ETC-GBP','GODS-USD','NMR-USD','TRB-BTC','BAT-BTC','NU-BTC','BADGER-USDT','BADGER-EUR','FIL-BTC','ERN-EUR','DREP-USDT','GUSD-USD','POLY-USD','WCFG-USDT','CLV-USDT','POLS-USD','DNT-USD','CTX-EUR','ERN-USD','TRAC-USD','SOL-USD','ERN-USDT','WLUNA-EUR','ANT-USD','MASK-USD','GYEN-USD','SUSHI-BTC','ADA-EUR','MATIC-USDT','SYLO-USDT','ELA-USDT','DIA-EUR','MONA-USD','CBETH-ETH','ADA-ETH','SUKU-USD','WLUNA-GBP','SKL-BTC','UNFI-USD','STORJ-BTC','OMG-EUR','ENJ-BTC','BOND-USDT','LTC-USD','KEEP-USD','ICP-GBP','MIR-EUR','FET-USD','ETH-DAI','UST-USDT','IOTX-EUR','SOL-EUR','MEDIA-USD','ZRX-USD','ZEN-USDT','ENS-USDT','PNG-USD','OP-USDT','LINK-USD','ARPA-USDT','ALEPH-USD','UNI-USD','MANA-USDC','AAVE-USD','ARPA-EUR','ETC-BTC','EOS-USD','REN-USD','GNT-USDC','CHZ-GBP','APE-USD','ATA-USD','REQ-EUR','LQTY-USD','SYN-USD','RLY-EUR','RAD-EUR','ALCX-EUR','XLM-BTC','GHST-USD','WBTC-BTC','MATIC-GBP','WLUNA-USDT','REQ-USD','XLM-EUR','DOT-USDT','ANKR-USD','ATOM-BTC','QNT-USD','MATIC-EUR','ETC-EUR','TIME-USDT','BTC-USDT','BAL-USD','USDT-GBP','XYO-USD','STX-USDT','ALCX-USD','MAGIC-USD','ETH-BTC','BOBA-USDT','BLZ-USD','LOOM-USD','SOL-ETH','ASM-USDT','NMR-GBP','SKL-EUR','ADA-BTC','BAL-BTC','FLOW-USD','PAX-USD','PLU-USD','ANKR-GBP','BICO-EUR','PERP-USD','QSP-USDT','XCN-USDT','SUSHI-GBP','BICO-USDT','GRT-EUR','UNI-GBP','RAD-USDT','DESO-EUR','EGLD-USD','SHIB-GBP','ZRX-BTC','TRU-BTC','SAND-USD','CBETH-USD','WAXL-USD','VGX-USDT','MDT-USD','BTRST-EUR','CLV-GBP','MATH-USDT','ATOM-GBP','IMX-USDT','XTZ-BTC','NCT-EUR','MDT-USDT','LCX-EUR','SKL-GBP','SWFTC-USD','DOT-USD','RAD-USD','LQTY-EUR','DNT-USDC','BCH-GBP','TRU-EUR','BICO-USD','MNDE-USD','EOS-BTC','FORTH-EUR','CRO-USDT','UST-USD','FIL-USD','DIA-USDT','IMX-USD','EOS-EUR','ORN-USDT','BTC-USD'))
+# option = st.sidebar.selectbox('Select a Cryptocurrency', ('BTC-USD','ETH-USD','USDT-USD','USDC-USD','BNB-USD','XRP-USD','BUSD-USD','DOGE-USD','ADA-USD','MATIC-USD','DOT-USD','DAI-USD','WTRX-USD','LTC-USD','SOL-USD','TRX-USD','SHIB-USD','HEX-USD','UNI7083-USD','STETH-USD','AVAX-USD','LEO-USD','LINK-USD','WBTC-USD','TON11419-USD','BTT-USD','XMR-USD','ATOM-USD','XLM-USD','CRO-USD','APE18876-USD','QNT-USD','ALGO-USD','VET-USD','HBAR-USD','FIL-USD','EOS-USD','USDP-USD','AAVE-USD','THETA-USD','XTZ-USD','AXS-USD','SAND-USD','KCS-USD','MANA-USD','FTM-USD','CAKE-USD','PAXG-USD','OSMO-USD','HNT-USD','ENJ-USD','AR-USD','BTG-USD','SUSHI-USD','ELON-USD','LPT-USD','ONE3945-USD','BABYDOGE-USD','RNDR-USD','PYR-USD','JOE-USD'))
+# st.sidebar.caption('Select a symbol or type in the symbol name')
 
+
+option = st.sidebar.selectbox('Select a Cryptocurrency', ('RLY-USD',
+   
+
+'METIS-USD',
+'FIDA-USD',
+'MLN-USD',
+'AURORA-USD',
+'SPELL-USD',
+'MXC-USD',
+'UMA-GBP',
+'DEXT-USD',
+'TRIBE-USD',
+'OOKI-USD',
+'NU-USD',
+'WLUNA-USD',
+'QI-USD',
+'XLM-USD',
+'MIR-USD',
+'COMP-BTC',
+'LCX-USD',
+'MKR-USD',
+'NMR-BTC',
+'REQ-BTC',
+'SUSHI-ETH',
+'MINA-USD',
+'CGLD-USD',
+'JUP-USD',
+'AVT-USD',
+'BAND-BTC',
+'WCFG-USD',
+'WAMPL-USD',
+'ICP-USD',
+'APT-USD',
+'BNT-GBP',
+'GALA-USD',
+'MKR-BTC',
+'FORTH-BTC',
+'RPL-USD',
+'RBN-USD',
+'ZEC-USD',
+'CTX-USD',
+'DIA-USD',
+'ELA-USD',
+'TIME-USD',
+'KNC-USD',
+'AIOZ-USD',
+'SUPER-USD',
+'AAVE-BTC',
+'DYP-USD',
+'AUCTION-USD',
+'CLV-USD',
+'ADA-GBP',
+'BUSD-USD',
+'AVAX-BTC',
+'BAT-ETH',
+'HFT-USD',
+'FARM-USD',
+'REP-USD',
+'AGLD-USD',
+'CRPT-USD',
+'DOGE-USD',
+'LINK-BTC',
+'BTRST-GBP',
+'HIGH-USD',
+'ALGO-GBP',
+'FIS-USD',
+'ILV-USD',
+'BCH-USD',
+'DREP-USD',
+'FOX-USD',
+'BCH-BTC',
+'RLC-BTC',
+'ALGO-BTC',
+'TRU-USD',
+'LRC-BTC',
+'AMP-USD',
+'MUSE-USD',
+'COTI-USD',
+'ADA-USD',
+'DOT-GBP',
+'BTCAUCTION-USD',
+'PUNDIX-USD',
+'BAND-GBP',
+'LDO-USD',
+'RARI-USD',
+'ENS-USD',
+'CVC-USD',
+'STX-USD',
+'DOGE-GBP',
+'BAT-USD',
+'BTRST-BTC',
+'SUSHI-USD',
+'SHIB-USD',
+'PYR-USD',
+'SOL-BTC',
+'CRV-USD',
+'YFI-USD',
+'SHPING-USD',
+'BADGER-USD',
+'GRT-USD',
+'MASK-GBP',
+'OMG-GBP',
+'COMP-USD',
+'CGLD-GBP',
+'XRP-GBP',
+'00-USD',
+'ALGO-USD',
+'SKL-USD',
+'FORTH-USD',
+'INDEX-USD',
+'AST-USD',
+'CVX-USD',
+'STORJ-USD',
+'GRT-BTC',
+'VGX-USD',
+'BTC-GBP',
+'FIL-GBP',
+'LIT-USD',
+'BIT-USD',
+'KNC-BTC',
+'GFI-USD',
+'DAI-USD',
+'INJ-USD',
+'DASH-BTC',
+'ENJ-USD',
+'YFII-USD',
+'XCN-USD',
+'BNT-BTC',
+'AAVE-GBP',
+'OP-USD',
+'LTC-GBP',
+'ASM-USD',
+'MPL-USD',
+'CTSI-USD',
+'OGN-BTC',
+'AXS-BTC',
+'HBAR-USD',
+'LTC-BTC',
+'FX-USD',
+'OGN-USD',
+'NEAR-USD',
+'NEST-USD',
+'OMG-BTC',
+'GRT-GBP',
+'COVAL-USD',
+'CRO-USD',
+'AERGO-USD',
+'PLA-USD',
+'ANKR-BTC',
+'LRC-USD',
+'C98-USD',
+'CRV-GBP',
+'ICP-BTC',
+'RGT-USD',
+'LPT-USD',
+'RAD-BTC',
+'MANA-ETH',
+'ETC-USD',
+'SOL-GBP',
+'RLY-GBP',
+'DASH-USD',
+'DESO-USD',
+'BNT-USD',
+'MUSD-USD',
+'ROSE-USD',
+'UMA-USD',
+'GNO-USD',
+'ACH-USD',
+'JASMY-USD',
+'MSOL-USD',
+'SNX-BTC',
+'MIR-GBP',
+'1INCH-GBP',
+'KSM-USD',
+'RAD-GBP',
+'OMG-USD',
+'MATH-USD',
+'ATOM-USD',
+'RARE-USD',
+'ETH-GBP',
+'LOKA-USD',
+'ARPA-USD',
+'ORCA-USD',
+'FORT-USD',
+'BAND-USD',
+'KRL-USD',
+'DOT-BTC',
+'DOGE-BTC',
+'NU-GBP',
+'XTZ-USD',
+'CHZ-USD',
+'NCT-USD',
+'TRB-USD',
+'REP-BTC',
+'ZEN-BTC',
+'XRP-BTC',
+'AVAX-USD',
+'GAL-USD',
+'CELR-USD',
+'ABT-USD',
+'HOPR-USD',
+'FORTH-GBP',
+'WBTC-USD',
+'UPI-USD',
+'MIR-BTC',
+'SYLO-USD',
+'BOBA-USD',
+'LINK-GBP',
+'NKN-GBP',
+'IDEX-USD',
+'MANA-USD',
+'POWR-USD',
+'CGLD-BTC',
+'TONE-USD',
+'QUICK-USD',
+'API3-USD',
+'NKN-USD',
+'RAI-USD',
+'SNX-USD',
+'MATIC-USD',
+'XTZ-GBP',
+'XYO-BTC',
+'ORN-USD',
+'POND-USD',
+'RLC-USD',
+'CTSI-BTC',
+'ORN-BTC',
+'IOTX-USD',
+'UMA-BTC',
+'UNI-BTC',
+'XRP-USD',
+'OXT-USD',
+'GTC-USD',
+'PRQ-USD',
+'YFI-BTC',
+'SNX-GBP',
+'BOND-USD',
+'INV-USD',
+'DAR-USD',
+'BTRST-USD',
+'MANA-BTC',
+'SNT-USD',
+'QSP-USD',
+'MTL-USD',
+'1INCH-USD',
+'ETH-USD',
+'ALICE-USD',
+'CRV-BTC',
+'OCEAN-USD',
+'ZEC-BTC',
+'MCO2-USD',
+'REN-BTC',
+'REQ-GBP',
+'GLM-USD',
+'LINK-ETH',
+'DDX-USD',
+'USDC-GBP',
+'PRO-USD',
+'RNDR-USD',
+'MATIC-BTC',
+'1INCH-BTC',
+'GMT-USD',
+'NKN-BTC',
+'ZEN-USD',
+'STG-USD',
+'WCFG-BTC',
+'GST-USD',
+'AXS-USD',
+'ETC-GBP',
+'GODS-USD',
+'NMR-USD',
+'TRB-BTC',
+'BAT-BTC',
+'NU-BTC',
+'FIL-BTC',
+'GUSD-USD',
+'POLY-USD',
+'POLS-USD',
+'DNT-USD',
+'ERN-USD',
+'TRAC-USD',
+'SOL-USD',
+'ANT-USD',
+'MASK-USD',
+'GYEN-USD',
+'SUSHI-BTC',
+'MONA-USD',
+'CBETH-ETH',
+'ADA-ETH',
+'SUKU-USD',
+'WLUNA-GBP',
+'SKL-BTC',
+'UNFI-USD',
+'STORJ-BTC',
+'ENJ-BTC',
+'LTC-USD',
+'KEEP-USD',
+'ICP-GBP',
+'FET-USD',
+'MEDIA-USD',
+'ZRX-USD',
+'PNG-USD',
+'LINK-USD',
+'ALEPH-USD',
+'UNI-USD',
+'AAVE-USD',
+'ETC-BTC',
+'EOS-USD',
+'REN-USD',
+'CHZ-GBP',
+'APE-USD',
+'ATA-USD',
+'LQTY-USD',
+'SYN-USD',
+'XLM-BTC',
+'GHST-USD',
+'WBTC-BTC',
+'MATIC-GBP',
+'REQ-USD',
+'ANKR-USD',
+'ATOM-BTC',
+'QNT-USD',
+'BAL-USD',
+'USDT-GBP',
+'XYO-USD',
+'ALCX-USD',
+'MAGIC-USD',
+'ETH-BTC',
+'BLZ-USD',
+'LOOM-USD',
+'SOL-ETH',
+'NMR-GBP',
+'ADA-BTC',
+'BAL-BTC',
+'FLOW-USD',
+'PAX-USD',
+'PLU-USD',
+'ANKR-GBP',
+'PERP-USD',
+'SUSHI-GBP',
+'UNI-GBP',
+'EGLD-USD',
+'SHIB-GBP',
+'ZRX-BTC',
+'TRU-BTC',
+'SAND-USD',
+'CBETH-USD',
+'WAXL-USD',
+'MDT-USD',
+'CLV-GBP',
+'ATOM-GBP',
+'XTZ-BTC',
+'SKL-GBP',
+'SWFTC-USD',
+'DOT-USD',
+'RAD-USD',
+'BCH-GBP',
+'BICO-USD',
+'MNDE-USD',
+'EOS-BTC',
+'UST-USD',
+'FIL-USD',
+'IMX-USD',
+'BTC-USD'))
 st.sidebar.caption('Select a symbol or type in the symbol name')
 
 # set date and calendar params with error detection
