@@ -9,7 +9,7 @@ The application is easy to use and efficent.  Users are promted to select either
 
 # Crypto Currencies
 
-The initial datasets outlined for crypto currencies include some of the basic information for the latest day of trading.  The Technical Indicators section ins applicable to both the stocks and crypto landing page and includes a Bollinger Bands, Moving Average Convergence Divergence, Relative Strength Index, True Strength Index and Rate of Change.  Each graph includes a button that will direct the user to helpful information on how to read each graph and their signifigance to the overall securitys financial picture. The final data set that is included in the crypto landing page is a prior 10 day snapshot.
+The initial datasets outlined for crypto currencies include some of the basic information for the latest day of trading.  The Technical Indicators section is applicable to the stocks, crypto, currency and commodities landing pages and includes a Bollinger Bands, Moving Average Convergence Divergence, Relative Strength Index, True Strength Index and Rate of Change.  Each graph includes a button that will direct the user to helpful information on how to read each graph and their signifigance to the overall securitys financial picture. The final data set that is included in the crypto landing page is a prior 10 day snapshot.
 
 ![.](images/Crypto_Dataset.png)
 
@@ -33,6 +33,10 @@ The TSI fluctuates between positive and negative territory. Positive territory m
 
 #### Key ROC Takeaway's
 Rate of change (ROC) refers to how quickly something changes over time. It is thus the acceleration or deceleration of changes (i.e., the rate) and not the magnitude of individual changes themselves. In finance, rate of change is used to understand price returns and identify momentum in trends. Moving averages are used by traders to understand the rates of change in asset prices by smoothing them out. The Price Rate of Change indicator is a technical tool that measures the percentage change in price between the current price and the price a certain number of periods ago.
+
+# Currency and Commodities
+
+The Currency and Commodities landing pages includes all of the information as above including the Technical Indicators for Bollinger Bands, Moving Average Convergence Divergence, Relative Strength Index, True Strength Index and Rate of Change.
 
 # Stocks
 
