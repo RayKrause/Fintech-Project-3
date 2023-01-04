@@ -1,10 +1,8 @@
 #####################
-# crypto page setup #
+# stocks page setup #
 #####################
 
-# import libraries
 #pip install yfinance
-# pip install matplotlib
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -12,8 +10,6 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 import webbrowser
 from PIL import Image
-import datetime
-
 
 ########################
 # Technical Indicators #
@@ -276,24 +272,23 @@ class TSIIndicator(IndicatorMixin):
         tsi_series = self._check_fillna(self._tsi, value=0)
         return pd.Series(tsi_series, name="tsi")
 
-###################    
-# Set up sidebar  #
-###################
+##################
+# Set up sidebar #
+##################
 # set sidebar title 
-st.sidebar.title('Crypto Dashboard 🪙')
+st.sidebar.title('Currencies Dashboard :currency_exchange:')
 
     
 # from PIL import Image 
-image = Image.open('./images/crypto_coins2.png')
+image = Image.open('./images/currency.jpg')
 st.sidebar.image(image)
+# load stock symbols list
+option = st.sidebar.selectbox('Select a Currency', ('EURUSD=X','CADUSD=X','JPY=X','GBPUSD=X','AUDUSD=X','NZDUSD=X','CNY=X','HKD=X','SGD=X','INR=X','MXN=X','PHP=X','IDR=X','THB=X','MYR=X','ZAR=X','RUB=X','EURJPY=X','GBPJPY=X','EURGBP=X','EURCAD=X'))
 
-# load crypto symbols list
-option = st.sidebar.selectbox('Select a Cryptocurrency', ('ALGO-USD','BTC-USD','ETH-USD','USDT-USD','USDC-USD','BNB-USD','XRP-USD','BUSD-USD','DOGE-USD','ADA-USD','MATIC-USD','DOT-USD','DAI-USD','WTRX-USD','LTC-USD','SOL-USD','TRX-USD','SHIB-USD','HEX-USD','UNI7083-USD','STETH-USD','AVAX-USD','LEO-USD','LINK-USD','WBTC-USD','TON11419-USD','BTT-USD','RLY-USD','METIS-USD','FIDA-USD','MLN-USD','AURORA-USD','SPELL-USD','MXC-USD','UMA-GBP','DEXT-USD','TRIBE-USD','OOKI-USD','NU-USD','WLUNA-USD','QI-USD','XLM-USD','MIR-USD','COMP-BTC','LCX-USD','MKR-USD',
-'NMR-BTC','REQ-BTC','SUSHI-ETH','MINA-USD','CGLD-USD','JUP-USD','AVT-USD','BAND-BTC','WCFG-USD','WAMPL-USD','ICP-USD','APT-USD','BNT-GBP','GALA-USD','MKR-BTC','FORTH-BTC','RPL-USD','RBN-USD','ZEC-USD','CTX-USD','DIA-USD','ELA-USD','TIME-USD','KNC-USD','AIOZ-USD','SUPER-USD','AAVE-BTC','DYP-USD','AUCTION-USD','CLV-USD','ADA-GBP','BUSD-USD','AVAX-BTC','BAT-ETH','HFT-USD','USDT-USD','FARM-USD','REP-USD','AGLD-USD','CRPT-USD','DOGE-USD','LINK-BTC','BTRST-GBP','HIGH-USD','ALGO-GBP','FIS-USD','ILV-USD','BCH-USD','DREP-USD','FOX-USD','BCH-BTC','RLC-BTC','ALGO-BTC','TRU-USD','LRC-BTC','AMP-USD','MUSE-USD','COTI-USD','ADA-USD','DOT-GBP','BTCAUCTION-USD','PUNDIX-USD','BAND-GBP','LDO-USD','RARI-USD','ENS-USD','CVC-USD','STX-USD','DOGE-GBP','BAT-USD','BTRST-BTC','SUSHI-USD','SHIB-USD','PYR-USD','SOL-BTC','CRV-USD','YFI-USD','SHPING-USD','BADGER-USD','GRT-USD','MASK-GBP','OMG-GBP','COMP-USD','CGLD-GBP','XRP-GBP','00-USD','SKL-USD','FORTH-USD','INDEX-USD','AST-USD','CVX-USD','STORJ-USD','GRT-BTC','VGX-USD','BTC-GBP','FIL-GBP','LIT-USD','BIT-USD','KNC-BTC','GFI-USD','DAI-USD','INJ-USD','DASH-BTC','ENJ-USD','YFII-USD','XCN-USD','BNT-BTC','AAVE-GBP','OP-USD','LTC-GBP','ASM-USD','MPL-USD','CTSI-USD','OGN-BTC','AXS-BTC','HBAR-USD','LTC-BTC','FX-USD','OGN-USD','NEAR-USD','NEST-USD','OMG-BTC','GRT-GBP', 'COVAL-USD','CRO-USD','AERGO-USD','PLA-USD','ANKR-BTC','LRC-USD','C98-USD','CRV-GBP','ICP-BTC','RGT-USD','LPT-USD','RAD-BTC','MANA-ETH','ETC-USD','SOL-GBP','RLY-GBP','DASH-USD','DESO-USD','BNT-USD','MUSD-USD','ROSE-USD','UMA-USD','GNO-USD','ACH-USD','JASMY-USD','MSOL-USD','SNX-BTC','MIR-GBP','1INCH-GBP','KSM-USD','RAD-GBP','OMG-USD','MATH-USD','ATOM-USD','RARE-USD','ETH-GBP','LOKA-USD','ARPA-USD','ORCA-USD','FORT-USD','BAND-USD','KRL-USD','DOT-BTC','DOGE-BTC','NU-GBP','XTZ-USD','CHZ-USD','NCT-USD','TRB-USD','REP-BTC','ZEN-BTC','XRP-BTC','AVAX-USD','GAL-USD','CELR-USD','ABT-USD','HOPR-USD','FORTH-GBP','WBTC-USD','UPI-USD','MIR-BTC','SYLO-USD','BOBA-USD','LINK-GBP','NKN-GBP','IDEX-USD','MANA-USD','POWR-USD','CGLD-BTC','TONE-USD','QUICK-USD','API3-USD','NKN-USD','RAI-USD','SNX-USD','MATIC-USD','XTZ-GBP','XYO-BTC','ORN-USD','POND-USD','RLC-USD','CTSI-BTC','ORN-BTC','IOTX-USD','UMA-BTC','UNI-BTC','XRP-USD','OXT-USD','GTC-USD','PRQ-USD','YFI-BTC','SNX-GBP','BOND-USD','INV-USD','DAR-USD','BTRST-USD','MANA-BTC','SNT-USD','QSP-USD','MTL-USD','1INCH-USD','ETH-USD','ALICE-USD','CRV-BTC','OCEAN-USD','ZEC-BTC','MCO2-USD','REN-BTC','REQ-GBP','GLM-USD','LINK-ETH','DDX-USD','USDC-GBP','PRO-USD','RNDR-USD','MATIC-BTC','1INCH-BTC','GMT-USD','NKN-BTC','ZEN-USD','STG-USD','WCFG-BTC','GST-USD','AXS-USD','ETC-GBP','GODS-USD','NMR-USD','TRB-BTC','BAT-BTC','NU-BTC','FIL-BTC','GUSD-USD','POLY-USD','POLS-USD','DNT-USD','ERN-USD','TRAC-USD','SOL-USD','ANT-USD','MASK-USD','GYEN-USD','SUSHI-BTC','MONA-USD','CBETH-ETH','ADA-ETH','SUKU-USD','WLUNA-GBP','SKL-BTC','UNFI-USD','STORJ-BTC','ENJ-BTC','LTC-USD','KEEP-USD','ICP-GBP','FET-USD','ETH-DAI','MEDIA-USD','ZRX-USD','PNG-USD','LINK-USD','ALEPH-USD','UNI-USD','AAVE-USD','ETC-BTC','EOS-USD','REN-USD','CHZ-GBP','APE-USD','ATA-USD','LQTY-USD','SYN-USD','XLM-BTC','GHST-USD','WBTC-BTC','MATIC-GBP','REQ-USD','ANKR-USD','ATOM-BTC','QNT-USD','BAL-USD','USDT-GBP','XYO-USD','ALCX-USD','MAGIC-USD','ETH-BTC','BLZ-USD','LOOM-USD','SOL-ETH','NMR-GBP','ADA-BTC','BAL-BTC','FLOW-USD','PAX-USD','PLU-USD','ANKR-GBP','PERP-USD','SUSHI-GBP','UNI-GBP','EGLD-USD','SHIB-GBP','ZRX-BTC','TRU-BTC','SAND-USD','CBETH-USD','WAXL-USD','MDT-USD','CLV-GBP','ATOM-GBP','XTZ-BTC','SKL-GBP','SWFTC-USD','DOT-USD','RAD-USD','BCH-GBP','BICO-USD','MNDE-USD','EOS-BTC','UST-USD','FIL-USD','IMX-USD','BTC-USD'))
-
-st.sidebar.caption('Select a symbol or type in the symbol name')
 
 # set date and calendar params with error detection
+import datetime
+
 today = datetime.date.today()
 before = today - datetime.timedelta(days=730)
 start_date = st.sidebar.date_input('Start date', before) 
@@ -302,38 +297,29 @@ if start_date < end_date:
     st.sidebar.success('Start date: `%s`\n\nEnd date:`%s`' % (start_date, end_date))
 else:
     st.sidebar.error('Error: End date must fall after start date.')
-
 # add creator information
 st.sidebar.caption('Presented by Jeff, Thomas and Ray :hotsprings:')
 
-url = 'https://finance.yahoo.com/crypto/?count=25&offset=0'
+url = 'https://https://https://finance.yahoo.com/currencies'
 # add a button to open the yahoo finance website
-if st.sidebar.button('Yahoo! Crypto'):
+if st.sidebar.button('Yahoo! Currencies'):
     webbrowser.open_new_tab(url)
 ##############
 # Stock data #
 ##############
-
 # setup of the main body window
 # create dataframe to get data from yahoo finance
 df = yf.download(option,start= start_date,end= end_date, progress=False)
 st.title(option)
-# create a 2 column view
-col1, col2 = st.columns(2)
-tickerData = yf.Ticker(option)
-with col1:
-    tickerData.major_holders
-with col2:
-    tickerData.institutional_holders
-# set a caption title
-st.caption('Provided by Yahoo! finance, results were generated a few mins ago. Pricing data is updated frequently. Currency in USD.')
+st.caption("note: previous day's closing data")
+st.dataframe(df.tail(1))
+
 # add a progress bar
 progress_bar = st.progress(0)
-# add a subheader
 st.subheader('_Technical Indicators_')
 st.markdown('##### Bollinger Bands®')
-# create the bollinger bands df
 indicator_bb = BollingerBands(df['Close'])
+# create the bollinger bands df
 bb = df
 bb['Bollinger_Band_High'] = indicator_bb.bollinger_hband()
 bb['Bollinger_Band_Low'] = indicator_bb.bollinger_lband()
@@ -350,7 +336,6 @@ roc = ROCIndicator(df['Close']).roc()
 ###################
 # Set up main app #
 ###################
-
 # plot the bollinger bands line chart
 st.line_chart(bb)
 # set the chickable button url detail
@@ -371,7 +356,7 @@ with col1:
     # create a button
     if st.button('MACD FAQs'):
         webbrowser.open_new_tab(url)
-# plot the Relative Strength Index (RSI) line chart    
+# plot the Relative Strength Index (RSI) line chart     
 with col2:
     st.markdown("##### Relative Strength Index (RSI)")
     st.line_chart(rsi)
@@ -383,13 +368,13 @@ with col2:
         webbrowser.open_new_tab(url)
 # add a seperator line
 progress_bar = st.progress(0)
-# create a 2 column view    
+# create a 2 column view     
 col1, col2 = st.columns(2)
 # plot the True Strength Index (TSI) line chart
 with col1: 
     st.markdown("##### True Strength Index (TSI)")
     st.line_chart(tsi)
-     # set the chickable button url detail 
+    # set the chickable button url detail
     url = 'https://www.investopedia.com/terms/t/tsi.asp'
     # create a button
     if st.button('True Strength Index (TSI) FAQs'):
@@ -409,6 +394,7 @@ progress_bar = st.progress(0)
 st.markdown("##### 10 Day Snapshot :chart_with_upwards_trend:")
 st.write(option)
 st.dataframe(df.tail(10))
+# add a seperator line
 progress_bar = st.progress(0)
 
 ################
@@ -418,7 +404,6 @@ progress_bar = st.progress(0)
 # load imports
 import base64
 from io import BytesIO
-
 # define the excel function
 def to_excel(df):
     output = BytesIO()
@@ -434,7 +419,7 @@ def get_table_download_link(df):
     return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="download.xlsx">Download excel file</a>'
 # define section title and download link
 st.markdown(" ")
-st.markdown("##### Create Crypto Report :pencil:")
+st.markdown("##### Create Stock Report :pencil:")
 st.markdown(get_table_download_link(df), unsafe_allow_html=True)
 # define the csv dataframe function
 @st.cache
@@ -446,7 +431,7 @@ csv = convert_df(df)
 st.download_button(
     label="Download data as CSV",
     data=csv,
-    file_name='crypto.csv',
+    file_name='stocks.csv',
     mime='text/csv',
 )
 
