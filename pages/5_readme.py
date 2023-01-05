@@ -70,6 +70,10 @@ st.markdown('<div style="text-align: justify;"> For either landing page the user
 st.markdown(' ')
 image = Image.open('./images/Create_File.png')
 st.image(image)
+st.markdown('## Future Enhancements')
+st.markdown('<div style="text-align: justify;"> Going forward we would like to add some additional future enhancements that include generation of PDF reports along with integration of our personal investment portfolios into the dashboard to allow for us to perform trades and research from a single app.</div>', unsafe_allow_html=True)
+st.markdown(' ')
+
 ###################    
 # Set up sidebar  #
 ###################
