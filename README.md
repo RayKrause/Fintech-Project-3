@@ -6,6 +6,11 @@ Our goal was to build an interactive dashboard allowing users to pull stock and 
 
 The application is easy to use and efficent.  Users are promted to select either a crypto or stock on the naviation bar located on the left.  The user also has a place to select the time frame of the dataset.  Once selected the applications main section outputs a number of important data charts and graphs that help users understand the current forecast of that security.  The data is pulled directly from Yahoo Finance with more information being available for stocks than crypto currencies.  
 
+# Installation Instructions
+
+To run the app ensure that all files and folders are copied to a specified local folder on your computer. This is a multipage streamlit app that uses the home.py file to run the app. The home.py file should be at the root of the folder with the image and pages folder as subfolders. To run the app using a terminal console navigate to the folder where the home.py file is located and type streamlit run home.py this will launch a browser session with the Investor Dashboard app. See below for an example of the folder structure.
+
+![.](images/install_folders.png)
 
 # Crypto Currencies
 
@@ -59,3 +64,7 @@ The stocks landing page includes all of the information as above but also includ
 For either landing page the user will have an opportunity to download either an excel spreadsheet or csv dataset by clicking either the link or button indicated.  The download will print all the relevant information presented on the landing page. 
 
 ![.](images/Create_File.png)
+
+# Future Enhancements
+
+Going forward we would like to add some additional future enhancements that include generation of PDF reports along with integration of our personal investment portfolios into the dashboard to allow for us to perform trades and research from a single app.
