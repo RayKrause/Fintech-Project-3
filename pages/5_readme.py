@@ -16,7 +16,12 @@ st.markdown('<div style="text-align: justify;"> Our goal was to build an interac
 st.markdown(' ')
 st.markdown('<div style="text-align: justify;"> The application is easy to use and efficent.  Users are promted to select either a crypto or stock on the naviation bar located on the left.  The user also has a place to select the time frame of the dataset.  Once selected the applications main section outputs a number of important data charts and graphs that help users understand the current forecast of that security.  The data is pulled directly from Yahoo Finance with more information being available for stocks than crypto currencies.</div>', unsafe_allow_html=True)
 st.markdown(' ')
-
+st.markdown(' ')
+st.markdown('## Installation Instructions')
+st.markdown('<div style="text-align: justify;"> To run the app ensure that all files and folders are copied to a specified local folder on your computer. This is a multipage streamlit app that uses the home.py file to run the app. The home.py file should be at the root of the folder with the image and pages folder as subfolders. To run the app using a terminal console navigate to the folder where the home.py file is located and type streamlit run home.py this will launch a browser session with the Investor Dashboard app. See below for an example of the folder structure.</div>', unsafe_allow_html=True)
+st.markdown(' ')
+image = Image.open('./images/install_folders.png')
+st.image(image)
 st.markdown('## Crypto Currencies')
 st.markdown('<div style="text-align: justify;"> The initial datasets outlined for crypto currencies include some of the basic information for the latest day of trading. The Technical Indicators section is applicable to the stocks, crypto, currency and commodities landing pages and includes a Bollinger Bands, Moving Average Convergence Divergence, Relative Strength Index, True Strength Index and Rate of Change. Each graph includes a button that will direct the user to helpful information on how to read each graph and their signifigance to the overall securitys financial picture. The final data set that is included in the crypto landing page is a prior 10 day snapshot.</div>', unsafe_allow_html=True)
 st.markdown(' ')
