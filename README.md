@@ -68,3 +68,7 @@ For either landing page the user will have an opportunity to download either an 
 # Future Enhancements
 
 Going forward we would like to add some additional future enhancements that include generation of PDF reports along with integration of our personal investment portfolios into the dashboard to allow for us to perform trades and research from a single app.
+
+![.](images/pdf_button.png)
+
+![.](images/portfolio_page.png)
