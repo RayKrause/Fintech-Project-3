@@ -458,3 +458,21 @@ st.download_button(
     mime='text/csv',
 )
 
+# create a PDF report
+from fpdf import FPDF
+import base64
+
+pdf = FPDF()  # pdf object
+pdf = FPDF(orientation="P", unit="mm", format="A4")
+pdf.add_page()
+
+pdf.set_font("Times", "B", 18)
+pdf.set_xy(10.0, 20)
+pdf.cell(w=75.0, h=5.0, align="L", txt="Future Enhancement - BETA Development")
+
+st.download_button(
+    "Download PDF Report",
+    data=pdf.output(dest='S').encode('latin-1'),
+    file_name="stocks.pdf",
+    mime="application/octet-stream",
+)
